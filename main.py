@@ -107,33 +107,27 @@ class planApp(menuMain):
         for i in self.group_stack:
             for j in self.group_stack[i]:
                 for l in self.group_stack[i][j]:
-                    # print(l)
                     ft = l.text()
                     font = QtGui.QFont()
                     font.setPointSize(11)
                     l.setFont(font)
-                    # if ft == 'TextLabel':
                     l.setText(' ')
 
     def clear_teach(self):
         for i in self.teach_stack:
             for j in self.teach_stack[i]:
                 for l in self.teach_stack[i][j]:
-                    # print(l)
                     ft = l.text()
                     font = QtGui.QFont()
                     font.setPointSize(11)
                     l.setFont(font)
-                    # if ft == 'TextLabel':
                     l.setText(' ')
 
     def change_menu(self, num):
         self.stackedWidget.setCurrentIndex(num)
 
     def input_plan(self, name, who):
-        # g607_11 = pd.read_excel('project\\plan\\607-11.xlsx')
-        # g607_12 = pd.read_excel('project\\plan\\607-12.xlsx')
-        all_lesson = pd.read_excel('project\\plan\\all.xlsx')
+        all_lesson = pd.read_excel('all.xlsx')
 
         self.clear_stud()
         self.clear_teach()
