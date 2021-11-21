@@ -18,6 +18,7 @@ from functools import partial
 class planApp(menuMain):
     def __init__(self):
         menuMain.__init__(self)
+        self.load_label()
 
         self.pushButton_grup_0.clicked.connect(partial(self.change_menu, num = 0))
         self.pushButton_grup_0.clicked.connect(partial(self.input_plan, name = '607-11', who = 'stud'))
@@ -35,6 +36,78 @@ class planApp(menuMain):
 
         self.label_2.setPixmap(QPixmap("surgulogo.png"))
 
+        self.clear_stud()
+        self.clear_teach()
+        self.set_text_other()
+
+    def clear_stud(self):
+        for i in self.group_stack:
+            for j in self.group_stack[i]:
+                for l in self.group_stack[i][j]:
+                    ft = l.text()
+                    font = QtGui.QFont()
+                    font.setPointSize(11)
+                    l.setFont(font)
+                    l.setText(' ')
+
+    def clear_teach(self):
+        for i in self.teach_stack:
+            for j in self.teach_stack[i]:
+                for l in self.teach_stack[i][j]:
+                    ft = l.text()
+                    font = QtGui.QFont()
+                    font.setPointSize(11)
+                    l.setFont(font)
+                    l.setText(' ')
+
+    def set_text_other(self):
+        for i in self.other_many_label:
+            font = QtGui.QFont()
+            font.setPointSize(11)
+            i.setFont(font)
+        for i in self.info_label_teach:
+            font = QtGui.QFont()
+            font.setPointSize(11)
+            i.setFont(font)
+
+    def change_menu(self, num):
+        self.stackedWidget.setCurrentIndex(num)
+
+    def input_plan(self, name, who):
+        all_lesson = pd.read_excel('project\\all.xlsx')
+
+        self.clear_stud()
+        self.clear_teach()
+        if who == 'stud':
+            for i in range(len(all_lesson)):
+                wal = all_lesson.loc[i,]
+                if wal['группа'] == name:
+                    try:
+                        self.group_stack[wal['день']]['Корпус'][int(wal['пара'])-1].setText(wal['кабинет'])
+                        self.group_stack[wal['день']]['Дисциплина'][int(wal['пара'])-1].setText(wal['дисциплина'])
+                        self.group_stack[wal['день']]['Преподаватель'][int(wal['пара'])-1].setText(wal['преподователь'])
+                    except Exception as e:
+                        print(e)
+
+            for i in self.info_label_group:
+                i.setText('Группа ' + name)
+
+        elif who == 'teacher':
+            for i in range(len(all_lesson)):
+                wal = all_lesson.loc[i,]
+                if name in wal['преподователь']:
+                    # print(name, wal['преподователь'])
+                    try:
+                        self.teach_stack[wal['день']]['Корпус'][int(wal['пара'])-1].setText(wal['группа'])
+                        self.teach_stack[wal['день']]['Дисциплина'][int(wal['пара'])-1].setText(wal['кабинет'])
+                        self.teach_stack[wal['день']]['Преподаватель'][int(wal['пара'])-1].setText(wal['дисциплина'])
+                    except Exception as e:
+                        print(e)
+
+            for i in self.info_label_teach:
+                i.setText('Преподователь ' + name)
+
+    def load_label(self):
         self.group_stack = {}
         self.group_stack['понедельник'] = {}
         self.group_stack['вторник'] = {}
@@ -42,7 +115,7 @@ class planApp(menuMain):
         self.group_stack['четверг'] = {}
         self.group_stack['пятница'] = {}
         self.group_stack['суббота'] = {}
- 
+
         self.group_stack['понедельник']['Корпус'] = [self.label_0_1_1_0, self.label_0_1_4_0, self.label_0_1_7_0, self.label_0_1_10_0, self.label_0_1_13_0, self.label_0_1_16_0, self.label_0_1_19_0, self.label_0_1_22_0]
         self.group_stack['понедельник']['Дисциплина'] = [self.label_0_1_2_0, self.label_0_1_5_0, self.label_0_1_8_0, self.label_0_1_11_0, self.label_0_1_14_0, self.label_0_1_17_0, self.label_0_1_20_0, self.label_0_1_23_0]
         self.group_stack['понедельник']['Преподаватель'] = [self.label_0_1_3_0, self.label_0_1_6_0, self.label_0_1_9_0, self.label_0_1_12_0, self.label_0_1_15_0, self.label_0_1_18_0, self.label_0_1_21_0, self.label_0_1_24_0]
@@ -99,60 +172,68 @@ class planApp(menuMain):
         self.teach_stack['суббота']['Дисциплина'] = [self.label_1_1_2_5, self.label_1_1_5_5, self.label_1_1_8_5, self.label_1_1_11_5, self.label_1_1_14_5, self.label_1_1_17_5, self.label_1_1_20_5, self.label_1_1_23_5]
         self.teach_stack['суббота']['Преподаватель'] = [self.label_1_1_3_5, self.label_1_1_6_5, self.label_1_1_9_5, self.label_1_1_12_5, self.label_1_1_15_5, self.label_1_1_18_5, self.label_1_1_21_5, self.label_1_1_24_5]
 
+        self.info_label_group = [self.label_80, self.label_81, self.label_82, self.label_84, self.label_85, self.label_86]
+        self.info_label_teach = [self.label_99, self.label_100, self.label_101, self.label_102, self.label_103, self.label_104]
 
-        self.clear_stud()
-        self.clear_teach()
+        self.other_many_label = [
+            self.label_0_0_0_0, self.label_0_0_0_1, self.label_0_0_0_2, self.label_0_0_0_3, self.label_0_0_0_4, self.label_0_0_0_5,
+            self.label_0_0_1_0, self.label_0_0_1_1, self.label_0_0_1_2, self.label_0_0_1_3, self.label_0_0_1_4, self.label_0_0_1_5,
+            self.label_0_0_2_0, self.label_0_0_2_1, self.label_0_0_2_2, self.label_0_0_2_3, self.label_0_0_2_4, self.label_0_0_2_5,
+            self.label_0_0_3_0, self.label_0_0_3_1, self.label_0_0_3_2, self.label_0_0_3_3, self.label_0_0_3_4, self.label_0_0_3_5,
+            self.label_0_0_4_0, self.label_0_0_4_1, self.label_0_0_4_2, self.label_0_0_4_3, self.label_0_0_4_4, self.label_0_0_4_5,
+            self.label_0_0_5_0, self.label_0_0_5_1, self.label_0_0_5_2, self.label_0_0_5_3, self.label_0_0_5_4, self.label_0_0_5_5,
+            self.label_0_0_6_0, self.label_0_0_6_1, self.label_0_0_6_2, self.label_0_0_6_3, self.label_0_0_6_4, self.label_0_0_6_5,
+            self.label_0_0_7_0, self.label_0_0_7_1, self.label_0_0_7_2, self.label_0_0_7_3, self.label_0_0_7_4, self.label_0_0_7_5,
+            self.label_0_0_8_0, self.label_0_0_8_1, self.label_0_0_8_2, self.label_0_0_8_3, self.label_0_0_8_4, self.label_0_0_8_5,
+            self.label_0_0_9_0, self.label_0_0_9_1, self.label_0_0_9_2, self.label_0_0_9_3, self.label_0_0_9_4, self.label_0_0_9_5,
+            self.label_0_0_10_0, self.label_0_0_10_1, self.label_0_0_10_2, self.label_0_0_10_3, self.label_0_0_10_4, self.label_0_0_10_5,
+            self.label_0_0_11_0, self.label_0_0_11_1, self.label_0_0_11_2, self.label_0_0_11_3, self.label_0_0_11_4, self.label_0_0_11_5,
 
-    def clear_stud(self):
-        for i in self.group_stack:
-            for j in self.group_stack[i]:
-                for l in self.group_stack[i][j]:
-                    ft = l.text()
-                    font = QtGui.QFont()
-                    font.setPointSize(11)
-                    l.setFont(font)
-                    l.setText(' ')
+            self.label_1_0_0_0, self.label_1_0_0_1, self.label_1_0_0_2, self.label_1_0_0_3, self.label_1_0_0_4, self.label_1_0_0_5,
+            self.label_1_0_1_0, self.label_1_0_1_1, self.label_1_0_1_2, self.label_1_0_1_3, self.label_1_0_1_4, self.label_1_0_1_5,
+            self.label_1_0_2_0, self.label_1_0_2_1, self.label_1_0_2_2, self.label_1_0_2_3, self.label_1_0_2_4, self.label_1_0_2_5,
+            self.label_1_0_3_0, self.label_1_0_3_1, self.label_1_0_3_2, self.label_1_0_3_3, self.label_1_0_3_4, self.label_1_0_3_5,
+            self.label_1_0_4_0, self.label_1_0_4_1, self.label_1_0_4_2, self.label_1_0_4_3, self.label_1_0_4_4, self.label_1_0_4_5,
+            self.label_1_0_5_0, self.label_1_0_5_1, self.label_1_0_5_2, self.label_1_0_5_3, self.label_1_0_5_4, self.label_1_0_5_5,
+            self.label_1_0_6_0, self.label_1_0_6_1, self.label_1_0_6_2, self.label_1_0_6_3, self.label_1_0_6_4, self.label_1_0_6_5,
+            self.label_1_0_7_0, self.label_1_0_7_1, self.label_1_0_7_2, self.label_1_0_7_3, self.label_1_0_7_4, self.label_1_0_7_5,
+            self.label_1_0_8_0, self.label_1_0_8_1, self.label_1_0_8_2, self.label_1_0_8_3, self.label_1_0_8_4, self.label_1_0_8_5,
+            self.label_1_0_9_0, self.label_1_0_9_1, self.label_1_0_9_2, self.label_1_0_9_3, self.label_1_0_9_4, self.label_1_0_9_5,
+            self.label_1_0_10_0, self.label_1_0_10_1, self.label_1_0_10_2, self.label_1_0_10_3, self.label_1_0_10_4, self.label_1_0_10_5,
+            self.label_1_0_11_0, self.label_1_0_11_1, self.label_1_0_11_2, self.label_1_0_11_3, self.label_1_0_11_4, self.label_1_0_11_5,
 
-    def clear_teach(self):
-        for i in self.teach_stack:
-            for j in self.teach_stack[i]:
-                for l in self.teach_stack[i][j]:
-                    ft = l.text()
-                    font = QtGui.QFont()
-                    font.setPointSize(11)
-                    l.setFont(font)
-                    l.setText(' ')
+            self.label_2_0_0_0, self.label_2_0_0_1, self.label_2_0_0_2, self.label_2_0_0_3, self.label_2_0_0_4, self.label_2_0_0_5,
+            self.label_2_0_1_0, self.label_2_0_1_1, self.label_2_0_1_2, self.label_2_0_1_3, self.label_2_0_1_4, self.label_2_0_1_5,
+            self.label_2_0_2_0, self.label_2_0_2_1, self.label_2_0_2_2, self.label_2_0_2_3, self.label_2_0_2_4, self.label_2_0_2_5,
+            self.label_2_0_3_0, self.label_2_0_3_1, self.label_2_0_3_2, self.label_2_0_3_3, self.label_2_0_3_4, self.label_2_0_3_5,
+            self.label_2_0_4_0, self.label_2_0_4_1, self.label_2_0_4_2, self.label_2_0_4_3, self.label_2_0_4_4, self.label_2_0_4_5,
+            self.label_2_0_5_0, self.label_2_0_5_1, self.label_2_0_5_2, self.label_2_0_5_3, self.label_2_0_5_4, self.label_2_0_5_5,
+            self.label_2_0_6_0, self.label_2_0_6_1, self.label_2_0_6_2, self.label_2_0_6_3, self.label_2_0_6_4, self.label_2_0_6_5,
+            self.label_2_0_7_0, self.label_2_0_7_1, self.label_2_0_7_2, self.label_2_0_7_3, self.label_2_0_7_4, self.label_2_0_7_5,
+            self.label_2_0_8_0, self.label_2_0_8_1, self.label_2_0_8_2, self.label_2_0_8_3, self.label_2_0_8_4, self.label_2_0_8_5,
+            self.label_2_0_9_0, self.label_2_0_9_1, self.label_2_0_9_2, self.label_2_0_9_3, self.label_2_0_9_4, self.label_2_0_9_5,
+            self.label_2_0_10_0, self.label_2_0_10_1, self.label_2_0_10_2, self.label_2_0_10_3, self.label_2_0_10_4, self.label_2_0_10_5,
+            self.label_2_0_11_0, self.label_2_0_11_1, self.label_2_0_11_2, self.label_2_0_11_3, self.label_2_0_11_4, self.label_2_0_11_5,
 
-    def change_menu(self, num):
-        self.stackedWidget.setCurrentIndex(num)
+            self.label_3_0_0_0, self.label_3_0_0_1, self.label_3_0_0_2, self.label_3_0_0_3, self.label_3_0_0_4, self.label_3_0_0_5,
+            self.label_3_0_1_0, self.label_3_0_1_1, self.label_3_0_1_2, self.label_3_0_1_3, self.label_3_0_1_4, self.label_3_0_1_5,
+            self.label_3_0_2_0, self.label_3_0_2_1, self.label_3_0_2_2, self.label_3_0_2_3, self.label_3_0_2_4, self.label_3_0_2_5,
+            self.label_3_0_3_0, self.label_3_0_3_1, self.label_3_0_3_2, self.label_3_0_3_3, self.label_3_0_3_4, self.label_3_0_3_5,
+            self.label_3_0_4_0, self.label_3_0_4_1, self.label_3_0_4_2, self.label_3_0_4_3, self.label_3_0_4_4, self.label_3_0_4_5,
+            self.label_3_0_5_0, self.label_3_0_5_1, self.label_3_0_5_2, self.label_3_0_5_3, self.label_3_0_5_4, self.label_3_0_5_5,
+            self.label_3_0_6_0, self.label_3_0_6_1, self.label_3_0_6_2, self.label_3_0_6_3, self.label_3_0_6_4, self.label_3_0_6_5,
+            self.label_3_0_7_0, self.label_3_0_7_1, self.label_3_0_7_2, self.label_3_0_7_3, self.label_3_0_7_4, self.label_3_0_7_5,
+            self.label_3_0_8_0, self.label_3_0_8_1, self.label_3_0_8_2, self.label_3_0_8_3, self.label_3_0_8_4, self.label_3_0_8_5,
 
-    def input_plan(self, name, who):
-        all_lesson = pd.read_excel('all.xlsx')
+            self.label_4_0_0_0, self.label_4_0_0_1, self.label_4_0_0_2, self.label_4_0_0_3, self.label_4_0_0_4, self.label_4_0_0_5,
+            self.label_4_0_1_0, self.label_4_0_1_1, self.label_4_0_1_2, self.label_4_0_1_3, self.label_4_0_1_4, self.label_4_0_1_5,
+            self.label_4_0_2_0, self.label_4_0_2_1, self.label_4_0_2_2, self.label_4_0_2_3, self.label_4_0_2_4, self.label_4_0_2_5,
+            self.label_4_0_3_0, self.label_4_0_3_1, self.label_4_0_3_2, self.label_4_0_3_3, self.label_4_0_3_4, self.label_4_0_3_5,
+            self.label_4_0_4_0, self.label_4_0_4_1, self.label_4_0_4_2, self.label_4_0_4_3, self.label_4_0_4_4, self.label_4_0_4_5,
+            self.label_4_0_5_0, self.label_4_0_5_1, self.label_4_0_5_2, self.label_4_0_5_3, self.label_4_0_5_4, self.label_4_0_5_5,
+            self.label_4_0_6_0, self.label_4_0_6_1, self.label_4_0_6_2, self.label_4_0_6_3, self.label_4_0_6_4, self.label_4_0_6_5,
+            self.label_4_0_7_0, self.label_4_0_7_1, self.label_4_0_7_2, self.label_4_0_7_3, self.label_4_0_7_4, self.label_4_0_7_5]
 
-        self.clear_stud()
-        self.clear_teach()
-        if who == 'stud':
-            for i in range(len(all_lesson)):
-                wal = all_lesson.loc[i,]
-                if wal['группа'] == name:
-                    try:
-                        self.group_stack[wal['день']]['Корпус'][int(wal['пара'])-1].setText(wal['кабинет'])
-                        self.group_stack[wal['день']]['Дисциплина'][int(wal['пара'])-1].setText(wal['дисциплина'])
-                        self.group_stack[wal['день']]['Преподаватель'][int(wal['пара'])-1].setText(wal['преподователь'])
-                    except Exception as e:
-                        print(e)
-
-        elif who == 'teacher':
-            for i in range(len(all_lesson)):
-                wal = all_lesson.loc[i,]
-                if name in wal['преподователь']:
-                    print(name, wal['преподователь'])
-                    try:
-                        self.teach_stack[wal['день']]['Корпус'][int(wal['пара'])-1].setText(wal['группа'])
-                        self.teach_stack[wal['день']]['Дисциплина'][int(wal['пара'])-1].setText(wal['кабинет'])
-                        self.teach_stack[wal['день']]['Преподаватель'][int(wal['пара'])-1].setText(wal['дисциплина'])
-                    except Exception as e:
-                        print(e)
 
 def windowLauncher():
     app = QtWidgets.QApplication(sys.argv)
